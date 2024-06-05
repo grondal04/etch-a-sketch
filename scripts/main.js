@@ -7,6 +7,7 @@ const DEFAULT_COLOR = 'rgb(255,255,255)'
 var sketchGrid;
 
 var randomRGBtoggle = true;
+var gridBorder = true;
 
 var btnResetGrid, btnRandomRGB, btnGridSize, btnGridBorder;
 
@@ -19,23 +20,10 @@ document.addEventListener('DOMContentLoaded', function() {
     btnGridBorder = document.getElementById('btn-grid-border');
 
     setGridSize(DEFAULT_SKETCH_SIZE);
-    let sketchBoxList = document.getElementsByClassName('sketch-box');
-    for (let box of sketchBoxList) {
-        box.addEventListener('mouseover', function() {
-            if (randomRGBtoggle) {
-                if (box.style.backgroundColor === DEFAULT_COLOR || box.style.backgroundColor === "") {
-                    box.style.backgroundColor = getRandomRGB();
-                } else if (box.style.backgroundColor != null) {
-                    box.style.backgroundColor = darkenRGB(box.style.backgroundColor);
-                }
-            }
-            else {
-                box.style.backgroundColor = 'black';
-            }
-        })
-    }
+    initBox();
 
     btnResetGrid.addEventListener('click', function() {
+        let sketchBoxList = document.getElementsByClassName('sketch-box');
         for (let box of sketchBoxList) {
             box.style.backgroundColor = '';
         }
@@ -52,15 +40,66 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
     })
+
+    btnGridSize.addEventListener('click', function() {
+        let newSize = parseInt(prompt('New size (1-100)'));
+        if (newSize < 0 || newSize > 100) return;
+
+        else if (newSize >= 1 && newSize <= 100) {
+            setGridSize(newSize);
+            initBox();
+        }
+    })
+
+    btnGridBorder.addEventListener('click', function() {
+        let sketchBoxList = document.getElementsByClassName('sketch-box');
+        
+        if (gridBorder) {
+            for (let box of sketchBoxList) {
+                box.style.border = 'none';
+            }
+            gridBorder = false;
+            btnGridBorder.classList.remove('lightgreen');
+        } else if (!gridBorder) {
+            for (let box of sketchBoxList) {
+                box.style.border = '1px solid black';
+            }
+            gridBorder = true;
+            btnGridBorder.classList.add('lightgreen');
+        }
+
+    })
 })
 
 
 function setGridSize(gridSize) {
+    sketchGrid.innerHTML = '';
     if (gridSize > 100) 
         gridSize = 100;
 
     for (let i = 0; i < Math.pow(gridSize, 2); i++) {
         sketchGrid.appendChild(createSketchBox(gridSize));
+    }
+}
+
+function initBox() {
+    let sketchBoxList = document.getElementsByClassName('sketch-box');
+    for (let box of sketchBoxList) {
+        if (gridBorder) {
+            box.style.border = '1px solid black';
+        }
+        box.addEventListener('mouseover', function() {
+            if (randomRGBtoggle) {
+                if (box.style.backgroundColor === DEFAULT_COLOR || box.style.backgroundColor === "") {
+                    box.style.backgroundColor = getRandomRGB();
+                } else if (box.style.backgroundColor != null) {
+                    box.style.backgroundColor = darkenRGB(box.style.backgroundColor);
+                }
+            }
+            else {
+                box.style.backgroundColor = 'black';
+            }
+        })
     }
 }
 
